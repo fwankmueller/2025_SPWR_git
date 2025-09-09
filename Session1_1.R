@@ -10,6 +10,8 @@ Require::Require(c("data.table", "tidyverse"))
 # all_daytime_good <- fread("~/work/2025-spwr-session1/drought-2018-ICOS-FLUXNETformat_allDaytimeGood.csv")      # takes about 1.5 minutes
 all_daytime_good <- readRDS("~/work/2025-spwr-session1/drought-2018-ICOS-FLUXNETformat_allDaytimeGood.RDS")    # takes 2 seconds
 
+# # locally for me:
+# all_daytime_good <- readRDS("../Teaching/2025_SoilPlantWaterRelationsExercises/flux-towers/drought-2018-ICOS-FLUXNETformat_allDaytimeGood.RDS")
 
 
 ##### WRANGLE data -----------------
@@ -21,8 +23,7 @@ all_daytime_good[, .N, site]
 
 ##### COMPUTE new (your job!) ------
 # EF calculation
-all_daytime_good %>% 
-  .[LE_F_MDS >= 0 & H_F_MDS >= 0, EF := ]
+all_daytime_good[LE_F_MDS >= 0 & H_F_MDS >= 0, EF := ]
 
 # save new data? --> download (More > Export ...)
 # save script --> download (More > Export ...)
@@ -33,7 +34,7 @@ all_daytime_good %>%
 ### PLOT examples CH-Cha
 # EF ~ SWC
 g2 <-
-  all_daytime_good[site %in% c("FLX_CH-Cha")]%>% 
+  all_daytime_good[site %in% c("FLX_CH-Cha")]%>%
   ggplot(aes(x = SWC_F_MDS_1, y = EF, col = VPD_F_MDS/10)) +    # /10 because VPD_F_MDS is in hPa, but we like kPa :)
   # geom_col() +
   geom_point() +
@@ -47,7 +48,7 @@ g2
 # Monthly Temperatures Ridgeplot
 Require::Require("ggridges")
 g3 <-
-  all_daytime_good[site %in% c("FLX_CH-Cha")]%>% 
+  all_daytime_good[site %in% c("FLX_CH-Cha")]%>%
   ggplot(aes(
     x = TA_F_MDS,
     y = factor(data.table::month(day)),
