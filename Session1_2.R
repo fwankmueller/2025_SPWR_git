@@ -139,3 +139,61 @@ EFs_summer <-
            on = .(site, day >= start, day <= end),
            nomatch = 0L,
            allow.cartesian = TRUE]
+
+
+
+
+# EF ~ SWC
+gxx <-
+  # EFs_drydown %>%
+  EFs_summer %>%
+  .[site %in% c("FLX_CH-Cha", "FLX_CH-Lae")]%>%
+  # .[VPD_F_MDS > 5] %>%
+  # .[SW_IN_F > 250] %>%
+  # .[WS_F > 0.5] %>%
+  # .[TA_F_MDS > 20] %>%
+  # .[!is.na(EF)] %>%
+  ggplot(aes(x = SWC_F_MDS_1, y = EF, col = VPD_F_MDS/10)) +
+  # geom_col() +
+  geom_point() +
+  scale_colour_viridis_c(option = "turbo", name = "VPD (kPa)", limits = c(0,5)) +
+  facet_wrap(~site, scales = "free") +
+  theme_bw() +
+  coord_cartesian(#ylim = c(0.5, 1),
+    expand = T) +
+  theme()
+gxx
+
+
+
+Require::Require(c("nlraa", "minpack.lm"))
+# library(nlraa)
+# library(minpack.lm)
+EFs_summer %>%
+  .[site %in% c("FLX_CH-Cha", "FLX_CH-Lae")]%>%
+  .[VPD_F_MDS > 5] %>%
+  .[SW_IN_F > 250] %>%
+  .[WS_F > 0.5] %>%
+  .[TA_F_MDS > 20] %>%
+  .[!is.na(EF)] %>%
+  ggplot(aes(x = SWC_F_MDS_1, y = EF,
+             col = TA_F_MDS)) + # VPD_F_MDS/10
+  # geom_col() +
+  geom_point() +
+  geom_line(stat = "smooth",
+            method = "nlsLM",
+            formula = y ~ SSlinp(x, a, b, xs),
+            se = FALSE,
+            color = "#CC0000",
+            linewidth = 2) +
+  scale_colour_viridis_c(option = "turbo",
+                         # name = "VPD (kPa)",
+                         # limits = c(0,5)
+  ) +
+  facet_wrap(~site, scales = "free") +
+  theme_bw() +
+  coord_cartesian(
+    # xlim = c(20,60),
+    # ylim = c(0.4, 1),
+    expand = T) +
+  theme()
